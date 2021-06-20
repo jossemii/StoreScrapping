@@ -15,28 +15,28 @@ def scrape(query: str, output:list, lock: threading.Lock):
     driver = webdriver.Firefox()
     driver.get(URL + query.replace(' ', '+'))
 
-    # Cuando la página este cargada.
-    sleep(10)
-
     # Access requests via the `requests` attribute
-    for request in driver.requests:
-        if request.response and 'https://redsky.target.com/redsky_aggregations' in request.url \
-            and request.method == 'GET' and request.response.status_code == 200:
-            data = requests.get(request.url).json()
-            break
-    
-    if not data: raise Exception('Connection error.')
-    o = []
-    for element in data['data']['search']['products']:
-        o.append({
-            'url': element['item']['enrichment']['buy_url'],
-            'title': element['item']['product_description']['title'],
-            'image_url': element['item']['enrichment']['images']['primary_image_url'],
-            'price': {
-                'amount': element['price']['current_retail'],
-                'currency': 'USD' if element['price']['formatted_current_price'][0] == '$' else 'CURRENCY_NOT_REGISTERED'
-            }
-        })
+    try:
+        for request in driver.requests:
+            if request.response and 'https://redsky.target.com/redsky_aggregations' in request.url \
+                and request.method == 'GET' and request.response.status_code == 200:
+                data = requests.get(request.url).json()
+                break
+
+        o = []
+        for element in data['data']['search']['products']:
+            o.append({
+                'url': element['item']['enrichment']['buy_url'],
+                'title': element['item']['product_description']['title'],
+                'image_url': element['item']['enrichment']['images']['primary_image_url'],
+                'price': {
+                    'amount': element['price']['current_retail'],
+                    'currency': 'USD' if element['price']['formatted_current_price'][0] == '$' else 'CURRENCY_NOT_REGISTERED'
+                }
+            })
+
+    except Exception as e:
+        raise Exception('Exception '+str(e)+' scraping '+query)
 
     driver.quit()
     display.stop()

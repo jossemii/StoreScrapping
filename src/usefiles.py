@@ -6,7 +6,7 @@ with open('input.json', 'r') as file:
 
 output = scraping.main(input['keywords'])
 
-with open('output.json', 'rw') as file:
+with open('output.json', 'w') as file:
     json.dump(
         scraping.main(input['keywords']),
         file
