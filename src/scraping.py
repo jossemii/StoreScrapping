@@ -17,21 +17,26 @@ def scrape(query: str, output:list, lock: threading.Lock):
 
     # Access requests via the `requests` attribute
     try:
+        while len(driver.requests)<20: sleep(1) # wait for load the web scripts.
+
         for request in driver.requests:
-            if request.response and 'https://redsky.target.com/redsky_aggregations' in request.url \
+            if request.response and 'https://redsky.target.com/redsky_aggregations/v1/web/plp_search_v1' in request.url \
                 and request.method == 'GET' and request.response.status_code == 200:
                 data = requests.get(request.url).json()
                 break
 
         o = []
         for element in data['data']['search']['products']:
+            currency = element['price']['formatted_current_price'][0]
+            item = element['item']
+
             o.append({
-                'url': element['item']['enrichment']['buy_url'],
-                'title': element['item']['product_description']['title'],
-                'image_url': element['item']['enrichment']['images']['primary_image_url'],
+                'url': item['enrichment']['buy_url'],
+                'title': item['product_description']['title'],
+                'image_url': item['enrichment']['images']['primary_image_url'],
                 'price': {
                     'amount': element['price']['current_retail'],
-                    'currency': 'USD' if element['price']['formatted_current_price'][0] == '$' else 'CURRENCY_NOT_REGISTERED'
+                    'currency': 'USD' if currency == '$' or  currency == 'S' else currency
                 }
             })
 
