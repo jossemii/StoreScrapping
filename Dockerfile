@@ -6,8 +6,7 @@ RUN apt-get update && apt-get install -y \
     fonts-liberation libappindicator3-1 libasound2 libatk-bridge2.0-0 \
     libnspr4 libnss3 lsb-release xdg-utils libxss1 libdbus-glib-1-2 \
     curl unzip wget \
-    xvfb
-
+    xvfb nano
 
 # install geckodriver and firefox
 
@@ -29,7 +28,7 @@ RUN FIREFOX_SETUP=firefox-setup.tar.bz2 && \
 
 RUN pip3 install --upgrade pip
 RUN pip3 install selenium-wire pyvirtualdisplay \
-    requests flask flask-pymongo
+    requests flask
 
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
@@ -41,3 +40,4 @@ WORKDIR /$APP_HOME
 COPY . $APP_HOME/
 
 CMD tail -f /dev/null
+ENTRYPOINT ["python3", "/app/src/server.py"]
