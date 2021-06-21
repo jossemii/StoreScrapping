@@ -11,7 +11,7 @@ A little intro about the installation.
 ```
 $ git clone https://github.com/josemibnf/SHALION-scrapping.git
 $ cd ../SHALION-scrapping
-$ docker build scraper 
+$ docker build -t scraper .
 ```
 ## How to use it
 ***
@@ -23,6 +23,14 @@ $ docker run -d -p 8080:8080 scraper
 $ python3
 $ import requests
 $ requests.get('http://localhost:8080/', json={'keywords': ['red', 'blue', 'green']}).json()
+Use proxy with the server
+```
+If docker raise a port error on the first step, other port can be used by:
+$ docker run -d -p other_port:8080 scraper
+..
+$ requests.get('http://localhost:other_port/', ....
+
+
 ```
 Working inside it with files
 ```
@@ -31,11 +39,4 @@ $ cd src/
 $ nano input.json
 $ python3 usefiles.py
 $ cat output.json
-```
-Use proxy with the server
-```
-$ docker run -d -p 8080:8080 scraper
-$ python3
-$ import requests
-$ requests.get('http://localhost:8080/', json={'keywords': ['red', 'blue', 'green'], proxy="http://79.143.87.138:9090"}).json()
 ```
