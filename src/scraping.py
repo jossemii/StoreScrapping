@@ -7,15 +7,18 @@ import threading
 URL = "https://www.target.com/s?searchTerm="
 
 
-def scrape(query: str, output:list, lock: threading.Lock):
+def scrape(query: str, output:list, lock: threading.Lock, proxy: str):
 
     display = Display(visible=0, size=(800, 600))
     display.start()
 
-    driver = webdriver.Firefox()
+    driver = webdriver.Firefox(
+        seleniumwire_options={
+            'proxy': {'https': proxy} if proxy[:5]=='https' else {'http': proxy}
+        }
+    ) if proxy else webdriver.Firefox()
     driver.get(URL + query.replace(' ', '+'))
 
-    # Access requests via the `requests` attribute
     try:
         while len(driver.requests)<20: sleep(1) # wait for load the web scripts.
 
@@ -48,11 +51,11 @@ def scrape(query: str, output:list, lock: threading.Lock):
     
     lock.acquire()
     try:
-        output.append(o)
+        output+=o
     finally:
         lock.release()
 
-def main(elements: list):
+def main(elements: list, proxy = None):
     threads = []
     output = []
 
@@ -60,7 +63,7 @@ def main(elements: list):
     for query in elements:
         process = threading.Thread(
             target=scrape, 
-            args=[ query, output, lock]
+            args=[ query, output, lock, proxy]
         )
         process.start()
         threads.append(process)
